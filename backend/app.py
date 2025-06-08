@@ -42,7 +42,7 @@ def verify_token(id_token):
     except Exception:
         return None
 
-@app.route('/upload', methods=['POST'])
+@app.route('/api/upload', methods=['POST'])
 def upload_file():
     id_token = request.headers.get('Authorization', '').split('Bearer ')[-1]
     uid = verify_token(id_token)
@@ -73,7 +73,7 @@ def upload_file():
 
     return jsonify({'message': 'File uploaded and processed'}), 200
 
-@app.route('/ask', methods=['POST'])
+@app.route('/api/ask', methods=['POST'])
 def ask():
     id_token = request.headers.get('Authorization', '').split('Bearer ')[-1]
     uid = verify_token(id_token)
@@ -94,7 +94,7 @@ def ask():
 
     return jsonify({'answer': answer}), 200
 
-@app.route('/files', methods=['GET'])
+@app.route('/api/files', methods=['GET'])
 def list_files():
     id_token = request.headers.get('Authorization', '').split('Bearer ')[-1]
     uid = verify_token(id_token)
@@ -105,7 +105,7 @@ def list_files():
     files = [doc.to_dict().get('filename', '') for doc in docs]
     return jsonify({'files': files}), 200
 
-@app.route('/history', methods=['GET'])
+@app.route('/api/history', methods=['GET'])
 def get_history():
     id_token = request.headers.get('Authorization', '').split('Bearer ')[-1]
     uid = verify_token(id_token)
