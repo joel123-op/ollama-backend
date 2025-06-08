@@ -59,6 +59,7 @@ googleapis-common-protos
 greenlet
 grpcio
 grpcio-status
+gunicorn
 h11
 httpcore
 httplib2
@@ -197,3 +198,4 @@ wrapt
 yarl
 zipp
 zstandard
+gunicorn
