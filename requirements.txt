@@ -51,7 +51,7 @@ google-api-python-client==2.170.0
 google-auth==2.40.2
 google-auth-httplib2==0.2.0
 google-cloud-core==2.4.3
-google-cloud-firestore==2.20.2
+google-cloud-firestore==2.11.1
 google-cloud-storage==3.1.0
 google-crc32c==1.7.1
 google-resumable-media==2.7.2
@@ -130,7 +130,7 @@ posthog==4.2.0
 prompt_toolkit==3.0.51
 propcache==0.3.1
 proto-plus==1.26.1
-protobuf==5.29.5
+protobuf>=3.20.2,<5.0.0
 psutil==7.0.0
 psycopg2==2.9.10
 psycopg2-binary==2.9.10
