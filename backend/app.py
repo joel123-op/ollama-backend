@@ -1,4 +1,5 @@
 import os
+import json
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
@@ -26,9 +27,10 @@ CHROMA_DB_DIR = "chroma_db"
 os.makedirs(CHROMA_DB_DIR, exist_ok=True)
 vectordb = Chroma(persist_directory=CHROMA_DB_DIR, embedding_function=EMBEDDINGS)
 
-# Initialize Firebase Admin
+# Initialize Firebase Admin (from environment variable on Render)
 if not firebase_admin._apps:
-    cred = credentials.Certificate('serviceAccountKey.json')
+    cred_dict = json.loads(os.environ["FIREBASE_CREDENTIALS"])
+    cred = credentials.Certificate(cred_dict)
     firebase_admin.initialize_app(cred)
 db = firestore.client()
 
