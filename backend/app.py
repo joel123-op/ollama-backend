@@ -3,38 +3,35 @@ import json
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
-from langchain_community.vectorstores import Chroma
-from langchain_community.embeddings import OllamaEmbeddings
+from langchain_chroma import Chroma
+from langchain_ollama import OllamaEmbeddings
 from langchain_community.document_loaders import PyPDFLoader, TextLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.chains import RetrievalQA
-from langchain.llms import Ollama
+from langchain_community.llms import Ollama
 import firebase_admin
 from firebase_admin import credentials, auth, firestore
 
 # Initialize Flask
 app = Flask(__name__)
-CORS(app)  # Enable CORS for React frontend
-
-# Ensure upload folder exists
+CORS(app)
 UPLOAD_FOLDER = 'uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-# Initialize Ollama + Chroma
-EMBEDDINGS = OllamaEmbeddings(model="mistral")
+# Ollama + Chroma with TinyLlama for better performance
+EMBEDDINGS = OllamaEmbeddings(model="tinyllama")
 CHROMA_DB_DIR = "chroma_db"
 os.makedirs(CHROMA_DB_DIR, exist_ok=True)
 vectordb = Chroma(persist_directory=CHROMA_DB_DIR, embedding_function=EMBEDDINGS)
 
-# Initialize Firebase Admin (from environment variable on Render)
+# Firebase Admin
+FIREBASE_CREDENTIALS_PATH = "serviceAccountKey.json"
 if not firebase_admin._apps:
-    cred_dict = json.loads(os.environ["FIREBASE_CREDENTIALS"])
-    cred = credentials.Certificate(cred_dict)
+    cred = credentials.Certificate(FIREBASE_CREDENTIALS_PATH)
     firebase_admin.initialize_app(cred)
 db = firestore.client()
 
-# Auth middleware placeholder
 def verify_token(id_token):
     try:
         decoded = auth.verify_id_token(id_token)
@@ -59,14 +56,12 @@ def upload_file():
     filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
     file.save(filepath)
 
-    # Load and split document
     loader = PyPDFLoader(filepath) if filename.lower().endswith('.pdf') else TextLoader(filepath)
     documents = loader.load()
-    splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
+    splitter = RecursiveCharacterTextSplitter(chunk_size=300, chunk_overlap=30)
     docs = splitter.split_documents(documents)
     vectordb.add_documents(docs)
 
-    # Save record in Firestore
     file_record = {'uid': uid, 'filename': filename}
     doc_ref = db.collection('uploads').document()
     doc_ref.set(file_record)
@@ -84,11 +79,10 @@ def ask():
     if not question:
         return jsonify({'error': 'No question provided'}), 400
 
-    llm = Ollama(model="mistral")
+    llm = Ollama(model="tinyllama")
     qa = RetrievalQA.from_chain_type(llm=llm, retriever=vectordb.as_retriever())
     answer = qa.run(question)
 
-    # Save history
     history_ref = db.collection('history').document()
     history_ref.set({'uid': uid, 'question': question, 'answer': answer})
 

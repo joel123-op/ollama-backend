@@ -52,7 +52,13 @@ function App() {
   }
 
   return (
-    <div className="h-screen">
+    <div style={{
+      height: "100vh",
+      position: "relative",
+      backgroundColor: "#0f0f0f",
+      color: "white",
+      overflow: "hidden"
+    }}>
       <Chat user={user} addHistory={() => {}} />
     </div>
   );

@@ -2,10 +2,29 @@
 @tailwind components;
 @tailwind utilities;
 
+/* 🌙 Global Theme */
 body {
   @apply bg-zinc-900 text-white;
 }
 
 * {
   font-family: 'Inter', sans-serif;
+}
+
+/* 💬 Chat Bubble Animation */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.animate-fadeIn {
+  animation: fadeIn 0.4s ease-in forwards;
+}
+
+/* 🖱️ Custom Scrollbar Styling */
+.custom-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+.custom-scroll::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
 }
